@@ -11,8 +11,8 @@ import os
 import sys
 from PIL import Image, ImageDraw, ImageFont
 
-CELL = 64
-MARGIN = 32
+CELL = 42
+MARGIN = 22
 W = CELL * 8 + MARGIN * 2
 H = CELL * 9 + MARGIN * 2
 
@@ -100,12 +100,12 @@ def render(pieces, output, highlights=None):
     img = Image.new("RGB", (W, H), BG)
     draw = ImageDraw.Draw(img, "RGBA")
     draw_board(draw)
-    river_font = ImageFont.truetype(FONT_PATH, 18)
+    river_font = ImageFont.truetype(FONT_PATH, 14)
     draw_river(draw, river_font)
     if highlights:
         for f, r in highlights:
             draw_highlight(draw, f, r)
-    piece_font = ImageFont.truetype(FONT_PATH, 30)
+    piece_font = ImageFont.truetype(FONT_PATH, 22)
     for f, r, c, is_red in pieces:
         draw_piece(draw, f, r, c, is_red, piece_font)
     img.save(output)
@@ -247,6 +247,100 @@ HAIDILAOYUE = [
 HAIDILAOYUE_HL = [(5, 5), (5, 1)]
 
 
+# === 残局 (ch4) ===
+
+# 单车胜单缺象（黑只剩一只 7 路象）
+END_CHE_QUEXIANG = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 10, "士", False),
+    (7, 10, "象", False),  # 仅剩 7 路象
+    (4, 7, "車", True),
+    (5, 1, "帥", True),
+]
+
+
+# 单车胜单士
+END_CHE_DAN_SHI = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (5, 6, "車", True),
+    (5, 2, "帥", True),  # 红帅在中线协同
+]
+
+
+# 车低兵必胜单缺象
+END_CHE_DI_BING = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 10, "士", False),
+    (7, 10, "象", False),
+    (5, 9, "兵", True),  # 已挺到底二线的"低兵"
+    (4, 5, "車", True),
+    (5, 2, "帥", True),
+]
+
+
+# 单马难胜单士（演示和棋形态）
+END_MA_DAN_SHI = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (3, 9, "馬", True),
+    (5, 2, "帥", True),
+]
+
+
+# === 习题 (ch8 一步杀) ===
+
+# 题 1: 红车在 5 路、底二线；红炮在 5 路、中线
+PUZZLE_1 = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 10, "士", False),
+    (3, 10, "象", False),
+    (7, 10, "象", False),
+    (5, 9, "車", True),
+    (5, 5, "炮", True),
+]
+
+# 题 2: 红马卧槽 (7,9)，红炮 (5, 9)，黑左士在 6 路
+PUZZLE_2 = [
+    (5, 10, "將", False),
+    (6, 10, "士", False),
+    (7, 9, "馬", True),
+    (5, 8, "炮", True),
+]
+
+# 题 3: 大胆穿心: 车 (4, 7), 红炮 (5, 3) 中线
+PUZZLE_3 = [
+    (5, 10, "將", False),
+    (4, 9, "士", False),
+    (6, 9, "士", False),
+    (3, 10, "象", False),
+    (7, 10, "象", False),
+    (4, 7, "車", True),
+    (5, 3, "炮", True),
+]
+
+# 题 4: 重炮 (5, 5)(5, 3)
+PUZZLE_4 = [
+    (5, 10, "將", False),
+    (4, 9, "士", False),  # 中士已被引开，只剩一边
+    (3, 10, "象", False),
+    (7, 10, "象", False),
+    (5, 5, "炮", True),
+    (5, 3, "炮", True),
+]
+
+# 题 5: 车 (4, 9)（要吃 4 路士）+ 马 (6, 9) 挂角
+PUZZLE_5 = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 9, "馬", True),
+    (4, 8, "車", True),
+]
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else "images"
     os.makedirs(out, exist_ok=True)
@@ -262,6 +356,15 @@ def main():
         ("kill-diaoyuma.png", DIAOYUMA, DIAOYUMA_HL),
         ("kill-shuangma.png", SHUANGMA, SHUANGMA_HL),
         ("kill-haidilaoyue.png", HAIDILAOYUE, HAIDILAOYUE_HL),
+        ("end-che-quexiang.png", END_CHE_QUEXIANG, None),
+        ("end-che-dan-shi.png", END_CHE_DAN_SHI, None),
+        ("end-che-di-bing.png", END_CHE_DI_BING, None),
+        ("end-ma-dan-shi.png", END_MA_DAN_SHI, None),
+        ("puzzle-01.png", PUZZLE_1, None),
+        ("puzzle-02.png", PUZZLE_2, None),
+        ("puzzle-03.png", PUZZLE_3, None),
+        ("puzzle-04.png", PUZZLE_4, None),
+        ("puzzle-05.png", PUZZLE_5, None),
     ]
     for filename, pieces, hl in diagrams:
         render(pieces, os.path.join(out, filename), hl)
