@@ -1,0 +1,20 @@
+title: 中国象棋入门到提高
+description: 写给会下棋、但水平还在入门徘徊的人
+theme: jekyll-theme-cayman
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: false
+include:
+  - README.md
+  - 00-前言.md
+  - 01-棋子价值.md
+  - 02-基本战术.md
+  - 03-基本杀法.md
+  - 04-实用残局.md
+  - 05-开局原理.md
+  - 06-常见开局.md
+  - 07-中局策略.md
+  - 08-练习题.md
+  - 99-术语对照.md
