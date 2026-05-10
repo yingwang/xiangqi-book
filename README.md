@@ -1,5 +1,7 @@
 # 中国象棋入门到提高
 
+📖 **在线阅读**：<https://yingwang.github.io/xiangqi-book/>
+
 ![starting position](images/starting.png)
 
 写给会下棋、但水平还在入门徘徊的人。
