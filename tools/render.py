@@ -11,10 +11,13 @@ import os
 import sys
 from PIL import Image, ImageDraw, ImageFont
 
-CELL = 42
-MARGIN = 22
+SS = 4  # 超采样倍数：渲染 4x 后用 LANCZOS 缩到目标尺寸，消除锯齿
+CELL = 42 * SS
+MARGIN = 22 * SS
 W = CELL * 8 + MARGIN * 2
 H = CELL * 9 + MARGIN * 2
+OUT_W = W // SS
+OUT_H = H // SS
 
 BG = (245, 220, 165)
 LINE = (60, 40, 20)
@@ -38,30 +41,31 @@ def coord(file, rank):
 
 
 def draw_board(draw):
+    lw = 2 * SS
     for f in range(1, 10):
         x, _ = coord(f, 1)
         y_top = MARGIN
         y_bot = MARGIN + 9 * CELL
         if f == 1 or f == 9:
-            draw.line([(x, y_top), (x, y_bot)], fill=LINE, width=2)
+            draw.line([(x, y_top), (x, y_bot)], fill=LINE, width=lw)
         else:
             y_riv_t = MARGIN + 4 * CELL
             y_riv_b = MARGIN + 5 * CELL
-            draw.line([(x, y_top), (x, y_riv_t)], fill=LINE, width=2)
-            draw.line([(x, y_riv_b), (x, y_bot)], fill=LINE, width=2)
+            draw.line([(x, y_top), (x, y_riv_t)], fill=LINE, width=lw)
+            draw.line([(x, y_riv_b), (x, y_bot)], fill=LINE, width=lw)
     for r in range(1, 11):
         _, y = coord(1, r)
         x1 = MARGIN
         x2 = MARGIN + 8 * CELL
-        draw.line([(x1, y), (x2, y)], fill=LINE, width=2)
+        draw.line([(x1, y), (x2, y)], fill=LINE, width=lw)
     # palace diagonals
     for ranks in [(1, 3), (8, 10)]:
         a = coord(4, ranks[1])
         b = coord(6, ranks[0])
         c = coord(6, ranks[1])
         d = coord(4, ranks[0])
-        draw.line([a, b], fill=LINE, width=1)
-        draw.line([c, d], fill=LINE, width=1)
+        draw.line([a, b], fill=LINE, width=SS)
+        draw.line([c, d], fill=LINE, width=SS)
 
 
 def draw_river(draw, font):
@@ -80,10 +84,10 @@ def draw_piece(draw, file, rank, char, is_red, font):
     x, y = coord(file, rank)
     r = CELL * 0.42
     color = RED if is_red else BLACK
-    draw.ellipse((x - r + 2, y - r + 3, x + r + 2, y + r + 3), fill=(0, 0, 0, 50))
-    draw.ellipse((x - r, y - r, x + r, y + r), fill=PIECE_BG, outline=color, width=2)
-    rin = r - 4
-    draw.ellipse((x - rin, y - rin, x + rin, y + rin), outline=color, width=1)
+    draw.ellipse((x - r + 2 * SS, y - r + 3 * SS, x + r + 2 * SS, y + r + 3 * SS), fill=(0, 0, 0, 50))
+    draw.ellipse((x - r, y - r, x + r, y + r), fill=PIECE_BG, outline=color, width=2 * SS)
+    rin = r - 4 * SS
+    draw.ellipse((x - rin, y - rin, x + rin, y + rin), outline=color, width=SS)
     bbox = draw.textbbox((0, 0), char, font=font)
     tw = bbox[2] - bbox[0]
     th = bbox[3] - bbox[1]
@@ -93,21 +97,22 @@ def draw_piece(draw, file, rank, char, is_red, font):
 def draw_highlight(draw, file, rank):
     x, y = coord(file, rank)
     r = CELL * 0.48
-    draw.ellipse((x - r, y - r, x + r, y + r), outline=HIGHLIGHT, width=3)
+    draw.ellipse((x - r, y - r, x + r, y + r), outline=HIGHLIGHT, width=3 * SS)
 
 
 def render(pieces, output, highlights=None):
     img = Image.new("RGB", (W, H), BG)
     draw = ImageDraw.Draw(img, "RGBA")
     draw_board(draw)
-    river_font = ImageFont.truetype(FONT_PATH, 14)
+    river_font = ImageFont.truetype(FONT_PATH, 14 * SS)
     draw_river(draw, river_font)
     if highlights:
         for f, r in highlights:
             draw_highlight(draw, f, r)
-    piece_font = ImageFont.truetype(FONT_PATH, 22)
+    piece_font = ImageFont.truetype(FONT_PATH, 22 * SS)
     for f, r, c, is_red in pieces:
         draw_piece(draw, f, r, c, is_red, piece_font)
+    img = img.resize((OUT_W, OUT_H), Image.Resampling.LANCZOS)
     img.save(output)
     print(f"wrote {output}")
 
