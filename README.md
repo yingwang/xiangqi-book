@@ -1,3 +1,8 @@
+---
+title: 首页
+nav_order: 0
+---
+
 # 中国象棋入门到提高
 
 📖 **在线阅读**：<https://yingwang.github.io/xiangqi-book/>

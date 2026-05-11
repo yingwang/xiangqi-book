@@ -1,11 +1,24 @@
 title: 中国象棋入门到提高
 description: 写给会下棋、但水平还在入门徘徊的人
-theme: jekyll-theme-cayman
+
+remote_theme: just-the-docs/just-the-docs
+
 plugins:
+  - jekyll-remote-theme
   - jekyll-relative-links
+  - jekyll-seo-tag
+
 relative_links:
   enabled: true
   collections: false
+
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+
+aux_links:
+  GitHub: https://github.com/yingwang/xiangqi-book
+
 include:
   - README.md
   - 00-前言.md
