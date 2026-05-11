@@ -346,6 +346,202 @@ PUZZLE_5 = [
 ]
 
 
+# === 习题 (ch8 两步杀) ===
+
+# 题 6: 红车 (5, 8) 过河中宫前，红炮底二线
+PUZZLE_6 = [
+    (5, 10, "將", False),
+    (4, 9, "士", False),
+    (6, 10, "士", False),
+    (3, 10, "象", False),
+    (7, 10, "象", False),
+    (5, 8, "車", True),
+    (5, 2, "炮", True),
+]
+
+# 题 7: 双车均沉到对方底二线
+PUZZLE_7 = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 10, "士", False),
+    (5, 8, "象", False),
+    (7, 9, "車", True),
+    (9, 9, "車", True),
+]
+
+# 题 8: 车在 4 路 + 钓鱼马 (7, 8)
+PUZZLE_8 = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 10, "士", False),
+    (3, 10, "象", False),
+    (6, 7, "車", True),
+    (7, 8, "馬", True),
+]
+
+# 题 9: 中线车在红底 + 中线后炮
+PUZZLE_9 = [
+    (5, 10, "將", False),
+    (4, 9, "士", False),
+    (6, 10, "士", False),
+    (3, 10, "象", False),
+    (7, 10, "象", False),
+    (5, 2, "車", True),
+    (5, 3, "炮", True),
+]
+
+# 题 10: 中线双炮 + 4 路车（引离中士）
+PUZZLE_10 = [
+    (5, 10, "將", False),
+    (5, 9, "士", False),  # 中士
+    (4, 10, "士", False),
+    (3, 10, "象", False),
+    (7, 10, "象", False),
+    (4, 8, "車", True),
+    (5, 5, "炮", True),
+    (5, 3, "炮", True),
+]
+
+# 题 11: 挂角马 + 4 路车
+PUZZLE_11 = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 10, "士", False),
+    (5, 8, "象", False),  # 中象 5 路
+    (6, 9, "馬", True),
+    (4, 9, "車", True),
+]
+
+# 题 12: 8 路沉底车 + 5 路马威胁 + 红底中线炮
+PUZZLE_12 = [
+    (5, 10, "將", False),
+    (4, 10, "士", False),
+    (6, 10, "士", False),
+    (3, 10, "象", False),
+    (7, 10, "象", False),
+    (8, 9, "車", True),
+    (5, 7, "馬", True),
+    (5, 3, "炮", True),
+]
+
+
+# === 常见开局 (ch6) - 每个开局走完骨架后的局面 ===
+
+def starting_dict():
+    """棋盘起始局面，以 dict 返回方便后续修改：键 = (file, rank)，值 = (char, is_red)."""
+    pos = {}
+    # red
+    for f, c in [(1, "車"), (2, "馬"), (3, "相"), (4, "仕"), (5, "帥"), (6, "仕"), (7, "相"), (8, "馬"), (9, "車")]:
+        pos[(f, 1)] = (c, True)
+    pos[(2, 3)] = ("炮", True)
+    pos[(8, 3)] = ("炮", True)
+    for f in [1, 3, 5, 7, 9]:
+        pos[(f, 4)] = ("兵", True)
+    # black
+    for f, c in [(1, "車"), (2, "馬"), (3, "象"), (4, "士"), (5, "將"), (6, "士"), (7, "象"), (8, "馬"), (9, "車")]:
+        pos[(f, 10)] = (c, False)
+    pos[(2, 8)] = ("砲", False)
+    pos[(8, 8)] = ("砲", False)
+    for f in [1, 3, 5, 7, 9]:
+        pos[(f, 7)] = ("卒", False)
+    return pos
+
+
+def apply(pos, src, dst):
+    """从源格搬到目标格（吃子即覆盖）."""
+    pos[dst] = pos[src]
+    del pos[src]
+
+
+def dict_to_pieces(pos):
+    return [(f, r, c, is_red) for (f, r), (c, is_red) in pos.items()]
+
+
+def opening_zhongpao_pingfengma():
+    """1. 炮二平五 马8进7  2. 马二进三 车9平8  3. 车一平二 马2进3
+       4. 兵七进一 卒7进1  5. 马八进七 炮8进4  6. 炮八平九 车8进4"""
+    pos = starting_dict()
+    apply(pos, (8, 3), (5, 3))   # 炮二平五
+    apply(pos, (8, 10), (7, 8))  # 马8进7
+    apply(pos, (8, 1), (7, 3))   # 马二进三
+    apply(pos, (9, 10), (8, 10)) # 车9平8
+    apply(pos, (9, 1), (8, 1))   # 车一平二
+    apply(pos, (2, 10), (3, 8))  # 马2进3
+    apply(pos, (3, 4), (3, 5))   # 兵七进一
+    apply(pos, (7, 7), (7, 6))   # 卒7进1
+    apply(pos, (2, 1), (3, 3))   # 马八进七
+    apply(pos, (8, 8), (8, 4))   # 炮8进4
+    apply(pos, (2, 3), (1, 3))   # 炮八平九
+    apply(pos, (8, 10), (8, 6))  # 车8进4
+    return dict_to_pieces(pos)
+
+
+def opening_fangongma():
+    """1. 炮二平五 马2进3  2. 马二进三 炮8平6  3. 兵七进一 马8进7
+       4. 马八进七 车9平8  5. 车一平二 车8进4"""
+    pos = starting_dict()
+    apply(pos, (8, 3), (5, 3))   # 炮二平五
+    apply(pos, (2, 10), (3, 8))  # 马2进3
+    apply(pos, (8, 1), (7, 3))   # 马二进三
+    apply(pos, (8, 8), (6, 8))   # 炮8平6
+    apply(pos, (3, 4), (3, 5))   # 兵七进一
+    apply(pos, (8, 10), (7, 8))  # 马8进7
+    apply(pos, (2, 1), (3, 3))   # 马八进七
+    apply(pos, (9, 10), (8, 10)) # 车9平8
+    apply(pos, (9, 1), (8, 1))   # 车一平二
+    apply(pos, (8, 10), (8, 6))  # 车8进4
+    return dict_to_pieces(pos)
+
+
+def opening_xianrenzhilu():
+    """1. 兵七进一 炮8平5  2. 马八进七 马8进7  3. 马二进三 车9平8"""
+    pos = starting_dict()
+    apply(pos, (3, 4), (3, 5))   # 兵七进一
+    apply(pos, (8, 8), (5, 8))   # 炮8平5
+    apply(pos, (2, 1), (3, 3))   # 马八进七
+    apply(pos, (8, 10), (7, 8))  # 马8进7
+    apply(pos, (8, 1), (7, 3))   # 马二进三
+    apply(pos, (9, 10), (8, 10)) # 车9平8
+    return dict_to_pieces(pos)
+
+
+def opening_feixiang():
+    """1. 相三进五 炮8平5  2. 马二进三 马8进7  3. 车一平二 车9平8"""
+    pos = starting_dict()
+    apply(pos, (7, 1), (5, 3))   # 相三进五
+    apply(pos, (8, 8), (5, 8))   # 炮8平5
+    apply(pos, (8, 1), (7, 3))   # 马二进三
+    apply(pos, (8, 10), (7, 8))  # 马8进7
+    apply(pos, (9, 1), (8, 1))   # 车一平二
+    apply(pos, (9, 10), (8, 10)) # 车9平8
+    return dict_to_pieces(pos)
+
+
+def opening_qima():
+    """1. 马八进七 炮8平5  2. 车九平八 马8进7  3. 兵三进一 车9平8"""
+    pos = starting_dict()
+    apply(pos, (2, 1), (3, 3))   # 马八进七
+    apply(pos, (8, 8), (5, 8))   # 炮8平5
+    apply(pos, (1, 1), (2, 1))   # 车九平八
+    apply(pos, (8, 10), (7, 8))  # 马8进7
+    apply(pos, (7, 4), (7, 5))   # 兵三进一
+    apply(pos, (9, 10), (8, 10)) # 车9平8
+    return dict_to_pieces(pos)
+
+
+def opening_shunshoupao():
+    """1. 炮二平五 炮2平5  2. 马二进三 马8进7  3. 车一平二 车9平8  4. 车二进六"""
+    pos = starting_dict()
+    apply(pos, (8, 3), (5, 3))   # 炮二平五
+    apply(pos, (2, 8), (5, 8))   # 炮2平5
+    apply(pos, (8, 1), (7, 3))   # 马二进三
+    apply(pos, (8, 10), (7, 8))  # 马8进7
+    apply(pos, (9, 1), (8, 1))   # 车一平二
+    apply(pos, (9, 10), (8, 10)) # 车9平8
+    apply(pos, (8, 1), (8, 7))   # 车二进六（红车过河抢肋线）
+    return dict_to_pieces(pos)
+
+
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else "images"
     os.makedirs(out, exist_ok=True)
@@ -370,6 +566,19 @@ def main():
         ("puzzle-03.png", PUZZLE_3, None),
         ("puzzle-04.png", PUZZLE_4, None),
         ("puzzle-05.png", PUZZLE_5, None),
+        ("puzzle-06.png", PUZZLE_6, None),
+        ("puzzle-07.png", PUZZLE_7, None),
+        ("puzzle-08.png", PUZZLE_8, None),
+        ("puzzle-09.png", PUZZLE_9, None),
+        ("puzzle-10.png", PUZZLE_10, None),
+        ("puzzle-11.png", PUZZLE_11, None),
+        ("puzzle-12.png", PUZZLE_12, None),
+        ("opening-zhongpao-pingfengma.png", opening_zhongpao_pingfengma(), None),
+        ("opening-fangongma.png", opening_fangongma(), None),
+        ("opening-xianrenzhilu.png", opening_xianrenzhilu(), None),
+        ("opening-feixiang.png", opening_feixiang(), None),
+        ("opening-qima.png", opening_qima(), None),
+        ("opening-shunshoupao.png", opening_shunshoupao(), None),
     ]
     for filename, pieces, hl in diagrams:
         render(pieces, os.path.join(out, filename), hl)
