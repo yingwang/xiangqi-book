@@ -32,3 +32,65 @@ include:
   - 08-练习题.md
   - 09-实战对局.md
   - 99-术语对照.md
+
+defaults:
+  - scope:
+      path: "README.md"
+    values:
+      title: "首页"
+      nav_order: 0
+  - scope:
+      path: "00-前言.md"
+    values:
+      title: "前言"
+      nav_order: 1
+  - scope:
+      path: "01-棋子价值.md"
+    values:
+      title: "第一章 棋子价值"
+      nav_order: 2
+  - scope:
+      path: "02-基本战术.md"
+    values:
+      title: "第二章 基本战术"
+      nav_order: 3
+  - scope:
+      path: "03-基本杀法.md"
+    values:
+      title: "第三章 基本杀法"
+      nav_order: 4
+  - scope:
+      path: "04-实用残局.md"
+    values:
+      title: "第四章 实用残局"
+      nav_order: 5
+  - scope:
+      path: "05-开局原理.md"
+    values:
+      title: "第五章 开局原理"
+      nav_order: 6
+  - scope:
+      path: "06-常见开局.md"
+    values:
+      title: "第六章 常见开局"
+      nav_order: 7
+  - scope:
+      path: "07-中局策略.md"
+    values:
+      title: "第七章 中局策略"
+      nav_order: 8
+  - scope:
+      path: "08-练习题.md"
+    values:
+      title: "第八章 练习题"
+      nav_order: 9
+  - scope:
+      path: "09-实战对局.md"
+    values:
+      title: "第九章 实战对局解析"
+      nav_order: 10
+  - scope:
+      path: "99-术语对照.md"
+    values:
+      title: "附录 术语与记谱"
+      nav_order: 11
